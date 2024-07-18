@@ -7,87 +7,87 @@ import java.util.Scanner;
 public class Client {
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        // Initialisieren von Client- und Servernamen sowie Portnummer
+        // Initialise client and server names and port number
         String nameClient = "";
         String serverName = "";
         int port = 7777;
 
-        // Anzeige einer Nachricht, dass die Verbindung aufgebaut wird
-        System.out.println("Verbindungsaufbau mit dem Server..");
+        // Display a message that the connection is being established
+        System.out.println(" Connection to the server...");
 
-        // Erzeugen eines neuen Sockets und Verbindung zu "localhost" auf Port 7777
+        // Create a new socket and connect to ‘localhost’ on port 7777
         Socket clientSocket = new Socket("localhost", port);
 
-        // Anzeige einer Nachricht, dass die Verbindung erfolgreich ist
-        System.out.println("Verbindung mit Server erfolgreich");
+        // Display a message that the connection is successful
+        System.out.println("Connection to server successful");
         System.out.println("--------------------------------------\n");
 
-        // Erzeugen von DataInputStream und DataOutputStream für die Kommunikation
+        // Create DataInputStream and DataOutputStream for communication
         DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
         Scanner scanner = new Scanner(System.in);
 
-        // Solange der Clientname leer ist, wird der Benutzer aufgefordert, seinen Namen einzugeben
+        // As long as the client name is empty, the user is prompted to enter their name
         while (nameClient == null || nameClient.trim().isEmpty()) {
-            System.out.print("Wie ist dein Name ? : ");
+            System.out.print("What's your name ? : ");
             nameClient = scanner.nextLine();
-            dos.writeUTF(nameClient);  // Senden des Clientnamens an den Server
-            serverName = dis.readUTF();  // Empfangen des Servernamens
+            dos.writeUTF(nameClient); // Send the client name to the server
+            serverName = dis.readUTF();  // Receive the server name
             break;
         }
 
         try {
-            // Schleife zur Auswahl von Optionen durch den Benutzer
+            // Loop for the selection of options by the user
             while (true) {
-                System.out.println("Wählen Sie eine Option:");
-                System.out.println("1. Chatten");
-                System.out.println("2. Beenden");
+                System.out.println("Select an option:");
+                System.out.println("1. Chat");
+                System.out.println("2. Exit");
 
                 String choice = scanner.nextLine();
 
-                // Falls die Wahl "1" ist, wird der Chat-Modus gestartet
+                // If the selection is ‘1’, chat mode is started
                 if (choice.equals("1")) {
-                    System.out.println("Chatten gestartet. Geben Sie 'exit' ein, um das Chatten zu beenden.");
-                    System.out.println("Drücken Sie q wird der Server beendet und Sie kommen in das Menü.");
+                    System.out.println("Chatting has started. Enter ‘exit’ to end the chat.");
+                    System.out.println("Pressing q will close the server and take you to the menu.");
 
-                    // Schleife für das Senden und Empfangen von Nachrichten
+                    // Loop for sending and receiving messages
                     while (true) {
                         System.out.print(nameClient + ": ");
                         String message = scanner.nextLine();
 
-                        // Falls die Nachricht "exit" ist, wird der Chat-Modus beendet
+                        // If the message is ‘exit’, the chat mode is ended
                         if (message.equalsIgnoreCase("exit")) {
                             break;
                         }
 
-                        // Senden der Nachricht an den Server
+                        // Send the message to the server
                         dos.writeUTF(message);
                         dos.flush();
 
-                        // Empfangen der Antwort vom Server
+                        // Receive the response from the server
                         String response = dis.readUTF();
 
-                        // Falls die Antwort "Server wird geschlossen" ist, wird der Server beendet
-                        if (response.equals("Server wird geschlossen")) {
-                            System.out.println("Server beendet !");
+                        // If the response is ‘Server is closing’, the server is terminated
+                        if (response.equals("Server will be closed")) {
+                            System.out.println("Server closed !");
                             break;
                         }
                         System.out.println(serverName + " :" + response);
                     }
                 } else if (choice.equals("2")) {
-                    // Falls die Wahl "2" ist, wird der Client beendet
-                    System.out.println("Client wird beendet.");
+                    // If the selection is ‘2’, the client is terminated
+                    System.out.println("Server will be closed");
                     break;
                 } else {
-                    // Ungültige Auswahl
-                    System.out.println("Ungültige Auswahl. Bitte versuchen Sie es erneut.");
+                    // Invalid selection
+                    System.out.println("Invalid selection. Please try again.");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Schließen der Datenströme und des Sockets
+        // Close the data streams and the socket
         dis.close();
         dos.close();
         clientSocket.close();
